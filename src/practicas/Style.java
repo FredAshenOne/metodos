@@ -1,6 +1,7 @@
 package practicas;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.Toolkit;
 
@@ -8,9 +9,12 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.border.LineBorder;
 
 public class Style {
@@ -23,7 +27,6 @@ public class Style {
 		btn.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(
 		new ImageIcon("views/cursor.png").getImage(),
 		new Point(0,0), "custom cursor"));
-		btn.setBorder(new LineBorder(Color.BLACK,3,true));
 	}
 	
 	public void lblPointer(JLabel lbl) {
@@ -36,7 +39,11 @@ public class Style {
 		p.setCursor(Toolkit.getDefaultToolkit().createCustomCursor(
 		new ImageIcon("views/cursor.png").getImage(),
 		new Point(0,0), "custom cursor"));
-		p.setBorder(new LineBorder(Color.decode("#00E676"),1,true));
+		
+	}
+	
+	public void comBorder(JComponent c,Color col) {
+		c.setBorder(new LineBorder(col,1,true));
 	}
 	
 	public void btnHover(JButton btn,Color cbord,Color cb,Color cf) {
@@ -83,15 +90,28 @@ public class Style {
 		btn.setContentAreaFilled(false);
 		btn.setBorderPainted(false);
 	}
+
 	
-	public void gBorders() {
-		
+	public void mdScrollPane(JScrollPane sp,JTable table) {
+		sp.setOpaque(true);
+		sp.setBackground(Color.WHITE);
+		table.setBackground(Color.WHITE);
+		table.setOpaque(true);
+		sp.getViewport().setBackground(Color.WHITE);
+		table.getTableHeader().setBackground(Color.white);
+		table.getTableHeader().setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 11));
 	}
 	
 	public void mdCombo(JComboBox cb) {
 		cb.setBackground(Color.WHITE);
 		cb.setOpaque(true);
 		cb.setBorder(null);
+	}
+	
+	public void setPadding(JComponent c) {
+		c.setBorder(BorderFactory.createCompoundBorder(
+				c.getBorder(), 
+		        BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 	}
 		
 }

@@ -27,17 +27,17 @@ import javax.swing.JTable;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
-public class Biseccion extends JFrame implements ActionListener,MouseListener{
+public class ReglaFalsa extends JFrame implements ActionListener,MouseListener{
 
 	private JPanel contentPane;
 	JButton btnBack,btnInicio;
 	Style s = new Style();
 	JTextField txtValue1,txtValue2,txtHelp;
 	JComboBox cbTolerancia;
-	double limitA,limitB,valorProbableAnterior;
+	double limitA,limitB,valorProbableAnterior,errorAbsoluto;
 	JLabel lblValue1,lblValue2,lblHelp,lblWarning;
 	private JTable tbBiseccion;
-	public Biseccion() {
+	public ReglaFalsa() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 836, 466);
 		contentPane = new JPanel();
@@ -178,7 +178,7 @@ public class Biseccion extends JFrame implements ActionListener,MouseListener{
 				new Object[][] {
 				},
 				new String[] {
-						"Iteracion","Limite A","Limite B", "Valor Probable","Funcion","Error Relativo","Error Porcentual","Error Absoluto"
+						"Iteracion","Limite A","Limite B", "Raiz","Error Relativo","Error Porcentual","Error Absoluto"
 				}
 			));
 		spTablaBiseccion.setViewportView(tbBiseccion);
@@ -224,13 +224,7 @@ public class Biseccion extends JFrame implements ActionListener,MouseListener{
 		
 	}
 	
-	public double getValorProbable() {
-		return (getLimitA()+getLimitB())/2;	
-	}
 	
-	public double getErrorRelativo() {
-		return getErrorAbsoluto() / getValorProbable();
-	}
 	
 	public void setLimitA(double  limitA) {
 		this.limitA = limitA;
@@ -248,6 +242,14 @@ public class Biseccion extends JFrame implements ActionListener,MouseListener{
 		return this.limitB;
 	}
 	
+	public double getValorProbable() {
+		return getLimitB()-((getFunctionExp(getLimitB())*(getLimitA()-getLimitB()))/(getFunctionExp(getLimitA())-getFunctionExp(getLimitB())));	
+	}
+	
+	public double getErrorRelativo() {
+		return getErrorAbsoluto() / getValorProbable();
+	}
+	
 	public double getFuncion() {
 		return (getValorProbable() * Math.sin(getValorProbable())) -1;
 	}
@@ -261,11 +263,18 @@ public class Biseccion extends JFrame implements ActionListener,MouseListener{
 	}
 	
 	public double getErrorAbsoluto() {
-		return Math.abs(getValorProbable() - getValorProbableAnterior());
+		return this.errorAbsoluto;
+	}
+	public void setErrorAbsoluto(double errorAbsoluto) {
+		this.errorAbsoluto = errorAbsoluto;
 	}
 	
 	public double getErrorPorcentual() {
 		return getErrorRelativo() * 100;
+	}
+	
+	public double getFunctionExp(double x) {
+		return Math.exp(-x)-Math.log(x);
 	}
 	
 	public void fillTable() {
@@ -283,20 +292,29 @@ public class Biseccion extends JFrame implements ActionListener,MouseListener{
 				if(isInt(txtHelp.getText())) {
 					if(isInt(txtValue1.getText())&&isInt(txtValue2.getText())) {
 						orderLimits();
-						int iteraciones = Integer.parseInt(txtHelp.getText());
-						for(int i =0 ; i < iteraciones;i++) {
-							model.addRow(new Object[] { 
-									i+1,getLimitA(),getLimitB(),getValorProbable(),getFuncion(),getErrorRelativo(),getErrorPorcentual(),getErrorPorcentual()
-							});
-							setValorProbableAnterior(getValorProbable());
-							if(getFuncion() < 0) {
-								setLimitA(getValorProbable());
-							}else {
-								setLimitB(getValorProbable());
-							}		
-							lblWarning.setText("");
+						if(!isNotSqrt()) {
+							int iteraciones = Integer.parseInt(txtHelp.getText());
+							for(int i =0 ; i < iteraciones;i++) {
+								setErrorAbsoluto(Math.abs(getValorProbable() - getValorProbableAnterior()));
+								
+								model.addRow(new Object[] { 
+										i+1,getLimitA(),getLimitB(),getValorProbable(),getErrorRelativo(),getErrorPorcentual(),getErrorPorcentual()
+								});
+								setValorProbableAnterior(getValorProbable());
+								if(getFunctionExp(getLimitA()) *getFunctionExp(getLimitB())<0) {
+									setLimitB(getValorProbable());
+								}else if(getFunctionExp(getLimitA()) *getFunctionExp(getLimitB())==0) {
+									setErrorAbsoluto(0);
+								}else {
+									setLimitA(getValorProbable());
+								}
+								lblWarning.setText("");
+							
+							}
+							tbBiseccion.setModel(model);
+						}else {
+							lblWarning.setText("El intervalo no tiene Raiz");
 						}
-						tbBiseccion.setModel(model);
 					}else{
 						lblWarning.setText("Formato de limites invalido");
 						lblWarning.setForeground(Color.red);
@@ -313,17 +331,22 @@ public class Biseccion extends JFrame implements ActionListener,MouseListener{
 					
 					if(isInt(txtValue1.getText())&&isInt(txtValue2.getText())) {
 						orderLimits();
+						
 						do{
 							i++;
+							setErrorAbsoluto(Math.abs(getValorProbable() - getValorProbableAnterior()));
+							
 							model.addRow(new Object[] { 
-									i+1,getLimitA(),getLimitB(),getValorProbable(),getFuncion(),getErrorRelativo(),getErrorPorcentual(),getErrorPorcentual()
+									i+1,getLimitA(),getLimitB(),getValorProbable(),getErrorRelativo(),getErrorPorcentual(),getErrorPorcentual()
 							});
 							
 							setValorProbableAnterior(getValorProbable());
-							if(getFuncion() < 0) {
-								setLimitA(getValorProbable());
-							}else {
+							if(getFunctionExp(getLimitA()) *getFunctionExp(getLimitB())<0) {
 								setLimitB(getValorProbable());
+							}else if(getFunctionExp(getLimitA()) *getFunctionExp(getLimitB())==0) {
+								setErrorAbsoluto(0);
+							}else {
+								setLimitA(getValorProbable());
 							}
 							lblWarning.setText("");
 						}while(errorEsp < getErrorRelativo());
@@ -350,10 +373,12 @@ public class Biseccion extends JFrame implements ActionListener,MouseListener{
 							});
 							
 							setValorProbableAnterior(getValorProbable());
-							if(getFuncion() < 0) {
+							if(getLimitA()*getValorProbable() < 0) {
+								setLimitB(getValorProbable());
+							}else if(getLimitA()*getValorProbable()>0){
 								setLimitA(getValorProbable());
 							}else {
-								setLimitB(getValorProbable());
+								setErrorAbsoluto(0);
 							}
 							lblWarning.setText("");
 							
@@ -391,5 +416,11 @@ public class Biseccion extends JFrame implements ActionListener,MouseListener{
 			setLimitA(getLimitB());
 			setLimitB(a);
 		}
+	}
+	
+	
+	
+	public boolean isNotSqrt() {
+		return getFunctionExp(getLimitA())*getFunctionExp(getLimitB())>0;
 	}
 }

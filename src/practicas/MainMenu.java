@@ -1,11 +1,13 @@
 package practicas;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -23,8 +25,8 @@ public class MainMenu extends JFrame implements ActionListener,MouseListener{
 	Style s = new Style();
 	JPanel pnBiseccion,pnSecante,pnReglaFalsa,pnPuntoFijo;
 	JButton btnBiseccion,btnReglaFalsa,btnSecante,btnPuntoFijo;
-	
-	
+	Biseccion b = new Biseccion();
+	ReglaFalsa rf = new ReglaFalsa();
 	public MainMenu() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 392, 225);
@@ -59,13 +61,14 @@ public class MainMenu extends JFrame implements ActionListener,MouseListener{
 		lblBiseccion.setFont(new Font("Yu Gothic UI Light", Font.PLAIN, 11));
 		lblBiseccion.setBounds(59, 0, 114, 49);
 		pnBiseccion.add(lblBiseccion);
-		btnBiseccion.addActionListener(this);
+		
 		
 		btnBiseccion = new JButton("");
 		btnBiseccion.setBounds(0, 0, 173, 49);
 		pnBiseccion.add(btnBiseccion);
 		s.btnTransparent(btnBiseccion);
 		btnBiseccion.addMouseListener(this);
+		btnBiseccion.addActionListener(this);
 		
 		pnPuntoFijo = new JPanel();
 		pnPuntoFijo.setBounds(10, 125, 173, 49);
@@ -114,6 +117,7 @@ public class MainMenu extends JFrame implements ActionListener,MouseListener{
 		s.btnTransparent(btnReglaFalsa);
 		btnReglaFalsa.addMouseListener(this);
 		btnReglaFalsa.addActionListener(this);
+		
 		pnSecante = new JPanel();
 		pnSecante.setBounds(193, 125, 173, 49);
 		mainPanel.add(pnSecante);
@@ -137,13 +141,26 @@ public class MainMenu extends JFrame implements ActionListener,MouseListener{
 		s.btnTransparent(btnSecante);
 		btnSecante.addMouseListener(this);
 		btnSecante.addActionListener(this);
+		b.btnBack.addActionListener(this);
+		rf.btnBack.addActionListener(this);
 	}
 
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
-		
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == btnBiseccion) {
+			this.setVisible(false);
+			b.setVisible(true);
+		}else if(e.getSource() == b.btnBack) {
+			this.setVisible(true);
+			b.setVisible(false);
+		}else if(e.getSource() == rf.btnBack) {
+			this.setVisible(true);
+			rf.setVisible(false);
+		}else if(e.getSource() == btnReglaFalsa){
+			this.setVisible(false);
+			rf.setVisible(true);
+		}
 	}
 
 
@@ -159,15 +176,23 @@ public class MainMenu extends JFrame implements ActionListener,MouseListener{
 		if(e.getSource() == pnBiseccion || e.getSource() == btnBiseccion) {
 			s.panelPointer(pnBiseccion);
 			s.btnPointer(btnBiseccion);
+			s.comBorder(btnBiseccion,Color.decode("#00E676"));
+			s.comBorder(pnBiseccion, Color.decode("#00E676"));
 		}else if(e.getSource() == pnReglaFalsa || e.getSource() == btnReglaFalsa) {
 			s.panelPointer(pnReglaFalsa);
+			s.comBorder(pnReglaFalsa, Color.decode("#00E676"));
 			s.btnPointer(btnReglaFalsa);
+			s.comBorder(btnReglaFalsa, Color.decode("#00E676"));
 		}else if(e.getSource() == pnSecante || e.getSource() == btnSecante) {
 			s.panelPointer(pnSecante);
 			s.btnPointer(btnSecante);
+			s.comBorder(btnSecante, Color.decode("#00E676"));
+			s.comBorder(pnSecante,Color.decode("#00E676"));
 		}else if(e.getSource() == pnPuntoFijo || e.getSource() ==  btnPuntoFijo) {
 			s.panelPointer(pnPuntoFijo);
+			s.comBorder(pnPuntoFijo, Color.decode("#00E676"));
 			s.btnPointer(btnPuntoFijo);
+			s.comBorder(btnPuntoFijo, Color.decode("#00E676"));
 		}
 	}
 
